@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Safe Tracer by NIDHIN R - AI-Powered Investigation Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Orbitron', monospace;
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 20s ease infinite;
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+
+    .detective-car-entrance {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeOut 1s ease-in-out 6s forwards;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+
+
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(57, 255, 20, 0.6), rgba(57, 255, 20, 0.2), transparent);
+      border: 2px solid rgba(57, 255, 20, 0.4);
+      animation: floatUp linear infinite;
+      box-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
+    }
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) translateX(0px) rotate(0deg) scale(0.5);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+        transform: translateY(90vh) translateX(var(--random-x)) rotate(36deg) scale(0.8);
+      }
+      90% {
+        opacity: 1;
+        transform: translateY(10vh) translateX(var(--sway-x)) rotate(324deg) scale(1.2);
+      }
+      100% {
+        transform: translateY(-10vh) translateX(var(--random-x)) rotate(360deg) scale(0.3);
+        opacity: 0;
+      }
+    }
+    .bubble:nth-child(1) { left: 8%; width: 45px; height: 45px; animation-duration: 9s; animation-delay: 0s; --random-x: -30px; --sway-x: 20px; }
+    .bubble:nth-child(2) { left: 18%; width: 30px; height: 30px; animation-duration: 12s; animation-delay: 2s; --random-x: 40px; --sway-x: -15px; }
+    .bubble:nth-child(3) { left: 28%; width: 65px; height: 65px; animation-duration: 8s; animation-delay: 1s; --random-x: -50px; --sway-x: 35px; }
+    .bubble:nth-child(4) { left: 38%; width: 40px; height: 40px; animation-duration: 11s; animation-delay: 3.5s; --random-x: 30px; --sway-x: -25px; }
+    .bubble:nth-child(5) { left: 48%; width: 50px; height: 50px; animation-duration: 10s; animation-delay: 1.8s; --random-x: -35px; --sway-x: 45px; }
+    .bubble:nth-child(6) { left: 58%; width: 35px; height: 35px; animation-duration: 13s; animation-delay: 4.2s; --random-x: 45px; --sway-x: -20px; }
+    .bubble:nth-child(7) { left: 68%; width: 60px; height: 60px; animation-duration: 7s; animation-delay: 0.8s; --random-x: -40px; --sway-x: 30px; }
+    .bubble:nth-child(8) { left: 78%; width: 25px; height: 25px; animation-duration: 14s; animation-delay: 2.8s; --random-x: 25px; --sway-x: -35px; }
+    .bubble:nth-child(9) { left: 88%; width: 45px; height: 45px; animation-duration: 9.5s; animation-delay: 3.8s; --random-x: -45px; --sway-x: 25px; }
+
+
+    .stars {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(3px 3px at 25px 35px, #39ff14, transparent),
+                  radial-gradient(2px 2px at 65px 85px, rgba(57, 255, 20, 0.8), transparent),
+                  radial-gradient(1px 1px at 105px 55px, #39ff14, transparent),
+                  radial-gradient(2px 2px at 145px 95px, rgba(57, 255, 20, 0.6), transparent),
+                  radial-gradient(3px 3px at 185px 45px, #39ff14, transparent),
+                  radial-gradient(1px 1px at 225px 75px, rgba(57, 255, 20, 0.9), transparent),
+                  radial-gradient(2px 2px at 265px 25px, #39ff14, transparent);
+      background-repeat: repeat;
+      background-size: 300px 120px;
+      animation: twinkleEnhanced 6s ease-in-out infinite alternate;
+    }
+    @keyframes twinkleEnhanced {
+      0% { opacity: 0.2; transform: scale(0.9); }
+      25% { opacity: 0.8; transform: scale(1.1); }
+      50% { opacity: 0.4; transform: scale(0.95); }
+      75% { opacity: 1; transform: scale(1.05); }
+      100% { opacity: 0.6; transform: scale(1); }
+    }
+
+
+    .floating-orb {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 25% 25%, rgba(57, 255, 20, 0.8), rgba(57, 255, 20, 0.3), transparent);
+      animation: orbFloat 15s ease-in-out infinite;
+      box-shadow: 0 0 40px rgba(57, 255, 20, 0.4);
+      filter: blur(1px);
+    }
+    @keyframes orbFloat {
+      0%, 100% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0.6; }
+      25% { transform: translateY(-80px) translateX(60px) scale(1.3); opacity: 0.9; }
+      50% { transform: translateY(20px) translateX(-40px) scale(0.8); opacity: 0.4; }
+      75% { transform: translateY(-60px) translateX(-80px) scale(1.1); opacity: 0.7; }
+    }
+    .floating-orb:nth-child(10) { top: 20%; left: 15%; width: 80px; height: 80px; animation-delay: 0s; animation-duration: 20s; }
+    .floating-orb:nth-child(11) { top: 60%; right: 20%; width: 60px; height: 60px; animation-delay: 5s; animation-duration: 18s; }
+    .floating-orb:nth-child(12) { bottom: 30%; left: 25%; width: 70px; height: 70px; animation-delay: 10s; animation-duration: 22s; }
+
+
+    .detective-scene-car {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .police-car {
+      position: absolute;
+      left: -300px;
+      bottom: 20%;
+      width: 200px;
+      height: 80px;
+      background: linear-gradient(90deg, #1e3a5f, #2c5f84);
+      border-radius: 10px 10px 5px 5px;
+      animation: carDrive 4s ease-in-out forwards;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    @keyframes carDrive {
+      0% { left: -300px; }
+      70% { left: 45%; }
+      100% { left: 45%; }
+    }
+
+    .car-roof {
+      position: absolute;
+      top: -15px;
+      left: 30px;
+      width: 140px;
+      height: 20px;
+      background: linear-gradient(90deg, #1a2f4a, #234a6b);
+      border-radius: 15px 15px 0 0;
+    }
+
+    .car-lights {
+      position: absolute;
+      top: 10px;
+      right: -10px;
+      width: 15px;
+      height: 30px;
+      background: linear-gradient(180deg, #39ff14, #ffffff);
+      border-radius: 0 10px 10px 0;
+      animation: policeFlash 1s ease-in-out infinite;
+    }
+
+    @keyframes policeFlash {
+      0%, 50% { background: linear-gradient(180deg, #39ff14, #ffffff); }
+      51%, 100% { background: linear-gradient(180deg, #ff3333, #ffffff); }
+    }
+
+    .car-wheels {
+      position: absolute;
+      bottom: -15px;
+      width: 25px;
+      height: 25px;
+      background: #222;
+      border-radius: 50%;
+      border: 3px solid #444;
+      animation: wheelSpin 0.5s linear infinite;
+    }
+
+    @keyframes wheelSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .wheel-front { left: 20px; }
+    .wheel-back { right: 20px; }
+
+    .detective-with-lens {
+      position: absolute;
+      right: -250px;
+      bottom: 25%;
+      width: 100px;
+      height: 150px;
+      animation: detectiveWalkIn 4s ease-in-out forwards;
+    }
+
+    @keyframes detectiveWalkIn {
+      0% { right: -250px; }
+      60% { right: 20%; }
+      100% { right: 20%; }
+    }
+
+    .detective-body-car {
+      width: 30px;
+      height: 70px;
+      background: linear-gradient(180deg, #2c3e50, #34495e);
+      position: absolute;
+      bottom: 30px;
+      left: 35px;
+      border-radius: 15px 15px 0 0;
+    }
+
+    .detective-head-car {
+      width: 25px;
+      height: 25px;
+      background: #fdbcb4;
+      border-radius: 50%;
+      position: absolute;
+      bottom: 100px;
+      left: 37px;
+      border: 2px solid #34495e;
+    }
+
+    .detective-hat-car {
+      width: 30px;
+      height: 15px;
+      background: #2c3e50;
+      position: absolute;
+      bottom: 115px;
+      left: 35px;
+      border-radius: 15px 15px 5px 5px;
+      box-shadow: 0 -5px 0 #34495e;
+    }
+
+    .magnifying-lens-big {
+      width: 50px;
+      height: 50px;
+      position: absolute;
+      bottom: 80px;
+      left: 10px;
+      animation: lensSearch 3s ease-in-out infinite;
+    }
+
+    .lens-glass {
+      width: 35px;
+      height: 35px;
+      border: 5px solid #39ff14;
+      border-radius: 50%;
+      background: rgba(57, 255, 20, 0.2);
+      box-shadow: 0 0 20px #39ff14;
+    }
+
+    .lens-handle {
+      position: absolute;
+      bottom: -15px;
+      right: -15px;
+      width: 20px;
+      height: 5px;
+      background: #39ff14;
+      transform: rotate(45deg);
+      border-radius: 3px;
+      box-shadow: 0 0 10px #39ff14;
+    }
+
+    @keyframes lensSearch {
+      0%, 100% { transform: rotate(-20deg) scale(1); }
+      50% { transform: rotate(20deg) scale(1.2); }
+    }
+
+    .login-box-car {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(0, 0, 0, 0.9);
+      border: 3px solid #39ff14;
+      border-radius: 15px;
+      padding: 30px;
+      animation: loginBoxAppear 2s ease-out 4s forwards;
+      box-shadow: 0 0 50px rgba(57, 255, 20, 0.6);
+    }
+
+    @keyframes loginBoxAppear {
+      0% { transform: translate(-50%, -50%) scale(0) rotate(180deg); }
+      100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+    }
+
+    .welcome-message {
+      color: #39ff14;
+      font-family: 'Courier New', monospace;
+      font-size: 1.5rem;
+      text-align: center;
+      text-shadow: 0 0 15px #39ff14;
+    }
+
+
+    .login-page-effects {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.4;
+    }
+
+    .cyber-grid {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(57, 255, 20, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57, 255, 20, 0.08) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridFlow 25s linear infinite;
+      opacity: 0.5;
+    }
+
+    @keyframes gridFlow {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(60px, 60px); }
+    }
+
+
+    .floating-shape {
+      position: absolute;
+      opacity: 0.6;
+      animation: shapeFloat 20s ease-in-out infinite;
+    }
+
+    .shape-triangle {
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 25px solid rgba(57, 255, 20, 0.3);
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+      animation-duration: 18s;
+    }
+
+    .shape-diamond {
+      width: 20px;
+      height: 20px;
+      background: rgba(57, 255, 20, 0.3);
+      transform: rotate(45deg);
+      top: 60%;
+      right: 15%;
+      animation-delay: 3s;
+      animation-duration: 22s;
+    }
+
+    .shape-hexagon {
+      width: 20px;
+      height: 20px;
+      background: rgba(57, 255, 20, 0.25);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      top: 30%;
+      right: 25%;
+      animation-delay: 1.5s;
+      animation-duration: 20s;
+    }
+
+    .shape-circle {
+      width: 18px;
+      height: 18px;
+      background: radial-gradient(circle, rgba(57, 255, 20, 0.3), transparent);
+      border-radius: 50%;
+      top: 70%;
+      left: 20%;
+      animation-delay: 4s;
+      animation-duration: 16s;
+    }
+
+    .shape-square {
+      width: 16px;
+      height: 16px;
+      background: rgba(57, 255, 20, 0.2);
+      border: 1px solid rgba(57, 255, 20, 0.3);
+      top: 45%;
+      left: 5%;
+      animation-delay: 2.5s;
+      animation-duration: 24s;
+    }
+
+    @keyframes shapeFloat {
+      0%, 100% { 
+        transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); 
+        opacity: 0.3; 
+      }
+      25% { 
+        transform: translateY(-40px) translateX(30px) rotate(90deg) scale(1.2); 
+        opacity: 0.6; 
+      }
+      50% { 
+        transform: translateY(20px) translateX(-20px) rotate(180deg) scale(0.8); 
+        opacity: 0.4; 
+      }
+      75% { 
+        transform: translateY(-30px) translateX(-40px) rotate(270deg) scale(1.1); 
+        opacity: 0.7; 
+      }
+    }
+
+
+    .light-particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(57, 255, 20, 0.8);
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(57, 255, 20, 0.6);
+      animation: particleMove 15s ease-in-out infinite;
+    }
+
+    .particle-1 {
+      top: 15%;
+      left: 25%;
+      animation-delay: 0s;
+      animation-duration: 12s;
+    }
+
+    .particle-2 {
+      top: 35%;
+      right: 20%;
+      animation-delay: 2s;
+      animation-duration: 14s;
+    }
+
+    .particle-3 {
+      bottom: 25%;
+      left: 15%;
+      animation-delay: 4s;
+      animation-duration: 16s;
+    }
+
+    .particle-4 {
+      top: 55%;
+      left: 40%;
+      animation-delay: 1s;
+      animation-duration: 13s;
+    }
+
+    .particle-5 {
+      bottom: 40%;
+      right: 30%;
+      animation-delay: 3s;
+      animation-duration: 15s;
+    }
+
+    @keyframes particleMove {
+      0%, 100% { 
+        transform: translate(0, 0) scale(1); 
+        opacity: 0.4; 
+      }
+      33% { 
+        transform: translate(50px, -30px) scale(1.5); 
+        opacity: 0.8; 
+      }
+      66% { 
+        transform: translate(-30px, 40px) scale(0.7); 
+        opacity: 0.6; 
+      }
+    }
+
+
+    .energy-wave {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border: 2px solid rgba(57, 255, 20, 0.2);
+      border-radius: 50%;
+      animation: waveExpand 8s ease-out infinite;
+    }
+
+    .wave-1 {
+      top: 30%;
+      left: 60%;
+      animation-delay: 0s;
+    }
+
+    .wave-2 {
+      bottom: 30%;
+      left: 20%;
+      animation-delay: 4s;
+    }
+
+    @keyframes waveExpand {
+      0% {
+        transform: scale(0.1);
+        opacity: 0.8;
+        border-width: 3px;
+      }
+      50% {
+        opacity: 0.4;
+        border-width: 2px;
+      }
+      100% {
+        transform: scale(2);
+        opacity: 0;
+        border-width: 1px;
+      }
+    }
+
+    .access-success-message {
+      color: #39ff14;
+      font-family: 'Courier New', monospace;
+      font-size: 1.2rem;
+      text-align: center;
+      animation: typeText 0.5s steps(20) forwards;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid #39ff14;
+      text-shadow: 0 0 15px #39ff14;
+      margin: 5px 0;
+    }
+
+    .access-success-message:nth-child(1) { animation-delay: 0s; }
+    .access-success-message:nth-child(2) { animation-delay: 0.5s; }
+    .access-success-message:nth-child(3) { animation-delay: 1s; }
+
+    @keyframes typeText {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    .access-granted {
+      color: #39ff14;
+      font-size: 2rem;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 20px;
+      animation: accessBlink 0.8s ease-in-out infinite;
+      text-shadow: 0 0 20px #39ff14;
+    }
+
+    @keyframes accessBlink {
+      0%, 50% { opacity: 1; transform: scale(1); }
+      51%, 100% { opacity: 0.5; transform: scale(1.1); }
+    }
+
+    /* Main Styling */
+    #logo-top, #admin-logo {
+      width: 140px !important;
+      height: 140px !important;
+      border-radius: 20px !important;
+      border: 4px solid #39ff14;
+      box-shadow: 0 0 40px rgba(57, 255, 20, 0.6);
+      background: rgba(0, 0, 0, 0.2);
+      padding: 4px !important;
+      transition: all 0.3s ease;
+      object-fit: contain !important;
+    }
+    #logo-top:hover, #admin-logo:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 60px rgba(57, 255, 20, 0.8);
+    }
+
+    .admin-title {
+      font-size: 2.5rem;
+      color: #39ff14;
+      text-shadow: 0 0 20px #39ff14;
+      margin-bottom: 0.5rem;
+    }
+
+    .admin-subtitle {
+      color: #cccccc;
+      margin-bottom: 2rem;
+    }
+
+    .login-card {
+      animation: cardFloat 3s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.85) !important;
+      backdrop-filter: blur(20px);
+      z-index: 100;
+      border: 1px solid rgba(57, 255, 20, 0.3);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+    @keyframes cardFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(57, 255, 20, 0.1), transparent);
+      transform: rotate(45deg);
+      animation: cardShine 4s ease-in-out infinite;
+    }
+    @keyframes cardShine {
+      0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .login-title {
+      text-align: center;
+      color: #39ff14;
+      margin-bottom: 30px;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .login-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 60vh;
+    }
+
+    .form-control, .login-input {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(57, 255, 20, 0.3);
+      border-radius: 10px;
+      color: #ffffff;
+      padding: 12px 15px;
+      font-family: 'Orbitron', monospace;
+    }
+
+    .form-control:focus, .login-input:focus {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: #39ff14;
+      box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+      color: #ffffff;
+      outline: none;
+    }
+
+    .form-control::placeholder, .login-input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .btn {
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary {
+      background: linear-gradient(45deg, #39ff14, #32cd32);
+      border: none;
+      color: #000000;
+    }
+
+    .btn-outline-light {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+    }
+
+    .floating-tools {
+      position: absolute;
+      animation: toolFloat 6s ease-in-out infinite;
+      color: #39ff14;
+      font-size: 24px;
+      text-shadow: 0 0 10px #39ff14;
+    }
+    @keyframes toolFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-20px) rotate(120deg); }
+      66% { transform: translateY(-10px) rotate(240deg); }
+    }
+    .tool-1 { top: 20%; left: 15%; animation-delay: 0s; }
+    .tool-2 { top: 30%; right: 20%; animation-delay: 1s; }
+    .tool-3 { bottom: 25%; left: 10%; animation-delay: 2s; }
+    .tool-4 { bottom: 15%; right: 15%; animation-delay: 3s; }
+
+    .container {
+      padding-bottom: 120px !important;
+    }
+
+    .admin-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 25% 25%, rgba(57, 255, 20, 0.1) 0%, transparent 50%);
+      z-index: -1;
+    }
+
+
+    .dashboard-section {
+      display: none;
+    }
+
+    .ai-status-panel, .quick-actions-card, .stat-card, .investigations-card, .chart-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(57, 255, 20, 0.3);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .ai-status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ai-status-indicators {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .status-dot.online {
+      background: #28a745;
+      box-shadow: 0 0 10px rgba(40, 167, 69, 0.6);
+    }
+
+    .status-dot.offline {
+      background: #dc3545;
+      box-shadow: 0 0 10px rgba(220, 53, 69, 0.6);
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 30px 20px;
+      transition: all 0.3s ease;
+    }
+
+    .stat-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+
+    .stat-content h5 {
+      font-size: 2rem;
+      color: #39ff14;
+      margin-bottom: 5px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .action-buttons .btn {
+      flex: 1;
+      min-width: 150px;
+      padding: 12px 20px;
+    }
+
+    .btn-success {
+      background: linear-gradient(45deg, #28a745, #20c997);
+      border: none;
+    }
+
+    .btn-info {
+      background: linear-gradient(45deg, #17a2b8, #6f42c1);
+      border: none;
+    }
+
+    .btn-warning {
+      background: linear-gradient(45deg, #ffc107, #fd7e14);
+      border: none;
+      color: #000000;
+    }
+
+    .btn-purple {
+      background: linear-gradient(45deg, #6f42c1, #e83e8c);
+      border: none;
+      color: white;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(45deg, #6c757d, #495057);
+      border: none;
+    }
+
+    .table-dark {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .table-dark th {
+      background: rgba(57, 255, 20, 0.2);
+      border-color: rgba(57, 255, 20, 0.3);
+      color: #39ff14;
+    }
+
+    .table-dark td {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .loading-spinner {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(57, 255, 20, 0.3);
+      border-radius: 50%;
+      border-top-color: #39ff14;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .site-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      text-align: center;
+      border-top: 1px solid rgba(57, 255, 20, 0.3);
+      z-index: 1000;
+    }
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .footer-logo {
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+    }
+
+    .badge {
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+
+    .alert {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(57, 255, 20, 0.3);
+      border-radius: 10px;
+      color: #ffffff;
+    }
+
+    .no-data-message {
+      text-align: center;
+      padding: 40px;
+      color: #cccccc;
+    }
+
+    @media (max-width: 768px) {
+      #logo-top, #admin-logo { width: 120px !important; height: 120px !important; }
+      .police-car { width: 150px; height: 60px; }
+      .detective-scene-car { padding: 20px; }
+      .welcome-message { font-size: 1.2rem; }
+      .access-granted { font-size: 1.5rem; }
+      .container { padding-bottom: 140px !important; }
+      .floating-orb { width: 50px !important; height: 50px !important; }
+      .bubble { max-width: 40px !important; max-height: 40px !important; }
+      .floating-shape { transform: scale(0.7) !important; }
+      .light-particle { transform: scale(0.8) !important; }
+      .energy-wave { width: 150px !important; height: 150px !important; }
+      .login-page-effects { opacity: 0.3; }
+      .admin-title { font-size: 2rem; }
+      .action-buttons { flex-direction: column; }
+      .action-buttons .btn { width: 100%; margin-bottom: 10px; min-width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-background"></div>
+
+
+  <div class="login-page-effects">
+    <div class="cyber-grid"></div>
+
+
+    <div class="floating-shape shape-triangle"></div>
+    <div class="floating-shape shape-diamond"></div>
+    <div class="floating-shape shape-hexagon"></div>
+    <div class="floating-shape shape-circle"></div>
+    <div class="floating-shape shape-square"></div>
+
+
+    <div class="light-particle particle-1"></div>
+    <div class="light-particle particle-2"></div>
+    <div class="light-particle particle-3"></div>
+    <div class="light-particle particle-4"></div>
+    <div class="light-particle particle-5"></div>
+
+
+    <div class="energy-wave wave-1"></div>
+    <div class="energy-wave wave-2"></div>
+  </div>
+
+  <div class="detective-car-entrance" id="detectiveCarEntrance">
+
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+
+
+    <div class="floating-orb"></div>
+    <div class="floating-orb"></div>
+    <div class="floating-orb"></div>
+
+
+    <div class="stars"></div>
+
+    <div class="detective-scene-car">
+      <div class="police-car">
+        <div class="car-roof"></div>
+        <div class="car-lights"></div>
+        <div class="car-wheels wheel-front"></div>
+        <div class="car-wheels wheel-back"></div>
+      </div>
+
+      <div class="detective-with-lens">
+        <div class="detective-head-car"></div>
+        <div class="detective-hat-car"></div>
+        <div class="detective-body-car"></div>
+        <div class="magnifying-lens-big">
+          <div class="lens-glass"></div>
+          <div class="lens-handle"></div>
+        </div>
+      </div>
+
+      <div class="login-box-car">
+        <div class="welcome-message">🕵️ Welcome to Safe Tracer by NIDHIN R</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mt-4">
+    <div class="floating-tools tool-1">🔍</div>
+    <div class="floating-tools tool-2">📋</div>
+    <div class="floating-tools tool-3">🔎</div>
+    <div class="floating-tools tool-4">📁</div>
+
+    <div class="text-center mb-4">
+      <img src="logo.png" alt="Safe Tracer Logo" id="admin-logo">
+      <h1 class="admin-title">🛡️ Safe Tracer by NIDHIN R - Investigator Dashboard</h1>
+      <p class="admin-subtitle">AI-Powered Investigation Portal</p>
+    </div>
+
+    <div id="loginSection" class="login-section">
+      <div class="login-card">
+        <h3 class="login-title">🔐 Secure AI Authentication</h3>
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="email" class="form-label">Investigator Email</label>
+            <input type="email" id="email" class="form-control login-input" placeholder="Enter Email here" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Secure Password</label>
+            <input type="password" id="password" class="form-control login-input" placeholder="Enter your password" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 login-submit-btn">
+            🔓 Access AI Dashboard
+          </button>
+        </form>
+        <div class="login-footer">
+          <button class="btn btn-outline-light btn-sm" onclick="window.location.href='index.html'">
+            ← Return to Public Site
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="loginSuccessModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: rgba(0, 0, 0, 0.95); border: 3px solid #39ff14; color: #39ff14;">
+          <div class="modal-body text-center p-4">
+            <div class="access-success-message">🔍 Safe Tracer Initializing...</div>
+            <div class="access-success-message">🛡️ Security Verified...</div>
+            <div class="access-success-message">🚔 Detective Authentication Complete...</div>
+            <div class="access-granted">✅ ACCESS GRANTED</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="dashboardSection" class="dashboard-section">
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="ai-status-panel">
+            <div class="ai-status-header">
+              <h4>🤖 Safe Tracer by NIDHIN R - AI System Status</h4>
+              <div class="ai-status-indicators">
+                <div class="status-dot" id="aiStatus"></div>
+                <span>AI Status</span>
+                <div class="status-dot" id="supabaseStatus"></div>
+                <span>Database</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-12">
+          <div class="quick-actions-card">
+            <h4>🎛️ Safe Tracer by NIDHIN R - AI Investigation Controls</h4>
+            <div class="action-buttons">
+              <button class="btn btn-success" id="uploadClueBtn">🤖 AI Upload & Sanitize Clue</button>
+              <button class="btn btn-info" id="generateAIReportBtn">📊 Generate AI Report</button>
+              <button class="btn btn-warning" id="correlateDataBtn">🔗 AI Correlation Analysis</button>
+              <button class="btn btn-purple" id="refreshDashboardBtn">🔄 Refresh AI Data</button>
+              <button class="btn btn-secondary" id="logoutBtn">🚪 Secure Logout</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-2">
+          <div class="stat-card">
+            <div class="stat-icon">🔍</div>
+            <div class="stat-content">
+              <h5 id="totalClues">0</h5>
+              <p>Active Cases</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="stat-card">
+            <div class="stat-icon">💬</div>
+            <div class="stat-content">
+              <h5 id="totalTips">0</h5>
+              <p>Anonymous Tips</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="stat-card">
+            <div class="stat-icon">🤖</div>
+            <div class="stat-content">
+              <h5 id="aiProcessed">0</h5>
+              <p>AI Processed</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="stat-card">
+            <div class="stat-icon">🔗</div>
+            <div class="stat-content">
+              <h5 id="correlations">0</h5>
+              <p>AI Correlations</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="stat-card">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-content">
+              <h5 id="highRisk">0</h5>
+              <p>High Priority</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+              <h5 id="resolved">0</h5>
+              <p>Resolved</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <div class="investigations-card">
+            <h4>📋 Safe Tracer by NIDHIN R - AI-Powered Active Investigations</h4>
+            <div class="table-responsive">
+              <table class="table table-dark table-striped" id="investigationsTable">
+                <thead>
+                  <tr>
+                    <th>Case ID</th>
+                    <th>Description</th>
+                    <th>Tips</th>
+                    <th>Priority</th>
+                    <th>AI Risk</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="investigationsTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center">
+                      <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        Loading investigations...
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="modal fade" id="fileUploadModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+              <h5 class="modal-title">📁 Upload Evidence - Choose Method</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+
+              <div class="mb-3">
+                <label class="form-label">Evidence Type:</label>
+                <div class="btn-group w-100 mb-3" role="group">
+                  <input type="radio" class="btn-check" name="caseType" id="newCaseType" value="new" checked>
+                  <label class="btn btn-outline-success" for="newCaseType">🆕 New Case</label>
+
+                  <input type="radio" class="btn-check" name="caseType" id="existingCaseType" value="existing">
+                  <label class="btn btn-outline-info" for="existingCaseType">📎 Add to Existing Case</label>
+                </div>
+              </div>
+
+
+              <div id="caseSelection" class="mb-3" style="display: none;">
+                <label for="existingCaseSelect" class="form-label">Select Existing Case:</label>
+                <select id="existingCaseSelect" class="form-select">
+                  <option value="">Loading cases...</option>
+                </select>
+                <small class="text-muted">Add additional evidence to an existing investigation</small>
+              </div>
+
+              <div class="mb-3">
+                <label for="evidenceDescription" class="form-label">Case Description / Evidence Details</label>
+                <textarea id="evidenceDescription" class="form-control" rows="3" placeholder="Enter detailed case description or additional evidence details for AI processing..."></textarea>
+              </div>
+
+
+              <div class="mb-3">
+                <label class="form-label">Choose Upload Method:</label>
+                <div class="btn-group w-100 mb-3" role="group">
+                  <input type="radio" class="btn-check" name="uploadMethod" id="urlMethod" value="url" checked>
+                  <label class="btn btn-outline-info" for="urlMethod">🔗 Image URL</label>
+
+                  <input type="radio" class="btn-check" name="uploadMethod" id="fileMethod" value="file">
+                  <label class="btn btn-outline-success" for="fileMethod">📁 Direct Upload</label>
+                </div>
+              </div>
+
+
+              <div id="urlUploadSection" class="mb-3">
+                <label for="evidenceUrl" class="form-label">Evidence Image URL</label>
+                <input type="url" id="evidenceUrl" class="form-control" placeholder="https://example.com/evidence.jpg">
+                <small class="text-muted">Paste the direct URL of the evidence image</small>
+              </div>
+
+
+              <div id="fileUploadSection" class="mb-3" style="display: none;">
+                <label for="evidenceFile" class="form-label">Evidence Image File</label>
+                <input type="file" id="evidenceFile" class="form-control" accept="image/*">
+                <small class="text-muted">Supported formats: JPG, PNG, GIF (Max: 10MB)</small>
+              </div>
+
+              <div class="mb-3" id="imagePreview" style="display: none;">
+                <label class="form-label">Preview</label>
+                <div class="text-center">
+                  <img id="previewImage" src="" alt="Preview" style="max-width: 100%; max-height: 300px; border-radius: 8px; border: 2px solid #39ff14;">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <div class="form-check">
+                  <input type="checkbox" id="uploadConfirmation" class="form-check-input">
+                  <label for="uploadConfirmation" class="form-check-label">
+                    <strong>I confirm this evidence is legitimate and I authorize AI privacy protection and processing</strong>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-success" id="uploadConfirmBtn" disabled>
+                <span id="uploadBtnText">🤖 AI Process & Upload</span>
+                <div class="spinner-border spinner-border-sm ms-2" id="uploadSpinner" style="display: none;"></div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="modal fade" id="caseDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+              <h5 class="modal-title" id="caseDetailsTitle">🔍 Case Details</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="caseDetailsBody"></div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="modal fade" id="originalEvidenceModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+              <h5 class="modal-title" id="originalEvidenceTitle">🔒 Original Evidence Access - Investigator Only</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+              <div class="alert alert-warning mb-3">
+                <strong>⚠️ CONFIDENTIAL EVIDENCE - AUTHORIZED ACCESS ONLY</strong>
+              </div>
+              <img id="originalEvidenceImage" src="" alt="Original Evidence" style="max-width: 100%; max-height: 70vh; border: 3px solid #39ff14; border-radius: 10px;">
+              <div class="evidence-access-log mt-3 p-3" style="background: rgba(57, 255, 20, 0.1); border: 1px solid rgba(57, 255, 20, 0.3); border-radius: 8px;">
+                <h6 class="text-success">📋 Evidence Access Log</h6>
+                <p><strong>Accessed On:</strong> <span id="accessDateTime"></span></p>
+                <p><strong>Accessed By:</strong> <span id="accessEmail"></span></p>
+                <p><strong>Case ID:</strong> <span id="accessCaseId"></span></p>
+                <p><strong>Access Type:</strong> Original Evidence Review</p>
+                <p><strong>Platform:</strong> Safe Tracer by NIDHIN R</p>
+                <small class="text-muted">This access has been logged for security and audit purposes.</small>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close Evidence</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-md-8 offset-md-2">
+          <div class="chart-card">
+            <h5>📊 Safe Tracer by NIDHIN R - AI Risk Assessment Distribution</h5>
+            <canvas id="riskChart" style="max-height: 400px;"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <img src="logo.png" width="24" height="24" alt="logo" class="footer-logo">
+      <strong>Developed by NIDHIN R</strong> | AI-Powered Safe Tracer Dashboard | r.nidhinofficial@gmail.com
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

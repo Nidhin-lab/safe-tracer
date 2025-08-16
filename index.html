@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Safe Tracer by NIDHIN R - AI-Powered Investigation Platform</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    #investigation-scanner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 350px;
+      height: 350px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(57, 255, 20, 0.1) 0%, rgba(0, 17, 34, 0.9) 70%);
+      border: 3px solid #39ff14;
+      box-shadow: 0 0 50px rgba(57, 255, 20, 0.4), inset 0 0 50px rgba(57, 255, 20, 0.1);
+      z-index: -1;
+      overflow: hidden;
+      animation: scannerPulse 6s ease-in-out infinite;
+    }
+    @keyframes scannerPulse {
+      0%, 100% { box-shadow: 0 0 50px rgba(57, 255, 20, 0.4), inset 0 0 50px rgba(57, 255, 20, 0.1); }
+      50% { box-shadow: 0 0 80px rgba(57, 255, 20, 0.6), inset 0 0 80px rgba(57, 255, 20, 0.2); }
+    }
+    .radar-sweep {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 4px;
+      height: 160px;
+      background: linear-gradient(to top, transparent, #39ff14, rgba(57, 255, 20, 0.3));
+      transform-origin: bottom center;
+      transform: translate(-50%, -100%) rotate(0deg);
+      animation: radarSweep 4s linear infinite;
+      box-shadow: 0 0 20px #39ff14, 0 0 40px rgba(57, 255, 20, 0.5);
+    }
+    @keyframes radarSweep {
+      0% { transform: translate(-50%, -100%) rotate(0deg); opacity: 1; }
+      100% { transform: translate(-50%, -100%) rotate(360deg); opacity: 1; }
+    }
+    .radar-grid {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1px solid rgba(57, 255, 20, 0.3);
+      animation: gridPulse 3s ease-in-out infinite;
+    }
+    @keyframes gridPulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
+    .radar-grid:nth-child(1) { width: 320px; height: 320px; animation-delay: 0s; }
+    .radar-grid:nth-child(2) { width: 240px; height: 240px; animation-delay: 0.5s; }
+    .radar-grid:nth-child(3) { width: 160px; height: 160px; animation-delay: 1s; }
+    .radar-grid:nth-child(4) { width: 80px; height: 80px; animation-delay: 1.5s; }
+    .crosshairs { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    .crosshairs::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(to bottom, transparent, rgba(57, 255, 20, 0.6), transparent);
+      transform: translateX(-50%);
+      animation: crosshairFlash 2s ease-in-out infinite;
+    }
+    .crosshairs::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(to right, transparent, rgba(57, 255, 20, 0.6), transparent);
+      transform: translateY(-50%);
+      animation: crosshairFlash 2s ease-in-out infinite 0.5s;
+    }
+    @keyframes crosshairFlash {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+    .evidence-dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #ff4444;
+      border-radius: 50%;
+      box-shadow: 0 0 15px #ff4444, 0 0 30px rgba(255, 68, 68, 0.5);
+      animation: evidencePulse 3s ease-in-out infinite;
+    }
+    @keyframes evidencePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(2); }
+    }
+    .evidence-dot:nth-child(5) { top: 25%; left: 35%; animation-delay: 0s; }
+    .evidence-dot:nth-child(6) { top: 65%; left: 70%; animation-delay: 1s; }
+    .evidence-dot:nth-child(7) { top: 45%; left: 15%; animation-delay: 2s; }
+    .evidence-dot:nth-child(8) { top: 80%; left: 45%; animation-delay: 0.5s; }
+    .evidence-dot:nth-child(9) { top: 15%; left: 75%; animation-delay: 1.5s; }
+    .magnifying-glass {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      animation: magnifySearch 12s ease-in-out infinite;
+      z-index: 10;
+    }
+    .glass-lens {
+      width: 45px;
+      height: 45px;
+      border: 5px solid #39ff14;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(57, 255, 20, 0.1) 0%, rgba(57, 255, 20, 0.05) 100%);
+      box-shadow: 0 0 25px rgba(57, 255, 20, 0.6), inset 0 0 15px rgba(57, 255, 20, 0.2);
+      position: relative;
+      animation: lensGlow 2s ease-in-out infinite;
+    }
+    @keyframes lensGlow {
+      0%, 100% { box-shadow: 0 0 25px rgba(57, 255, 20, 0.6), inset 0 0 15px rgba(57, 255, 20, 0.2); }
+      50% { box-shadow: 0 0 35px rgba(57, 255, 20, 0.8), inset 0 0 25px rgba(57, 255, 20, 0.3); }
+    }
+    .glass-handle {
+      position: absolute;
+      bottom: -22px;
+      right: -22px;
+      width: 28px;
+      height: 6px;
+      background: linear-gradient(45deg, #39ff14, #32cd32, #39ff14);
+      transform: rotate(45deg);
+      border-radius: 3px;
+      box-shadow: 0 0 10px rgba(57, 255, 20, 0.8);
+    }
+    @keyframes magnifySearch {
+      0% { top: 30px; left: 30px; transform: scale(1) rotate(0deg); }
+      25% { top: 60px; left: 280px; transform: scale(1.3) rotate(90deg); }
+      50% { top: 250px; left: 220px; transform: scale(1.1) rotate(180deg); }
+      75% { top: 220px; left: 40px; transform: scale(1.2) rotate(270deg); }
+      100% { top: 30px; left: 30px; transform: scale(1) rotate(360deg); }
+    }
+    .detective-badge {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90px;
+      height: 90px;
+      background: radial-gradient(circle at 30% 30%, #ffd700, #b8860b, #8b6914);
+      clip-path: polygon(50% 0%, 80% 30%, 100% 50%, 80% 70%, 50% 100%, 20% 70%, 0% 50%, 20% 30%);
+      animation: badgeShine 5s ease-in-out infinite;
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.7), inset 0 0 20px rgba(255, 255, 255, 0.3);
+      z-index: 15;
+    }
+    @keyframes badgeShine {
+      0%, 100% { filter: brightness(1) drop-shadow(0 0 15px gold); transform: translate(-50%, -50%) scale(1); }
+      50% { filter: brightness(1.8) drop-shadow(0 0 30px gold); transform: translate(-50%, -50%) scale(1.05); }
+    }
+    .badge-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #001122;
+      font-weight: bold;
+      font-size: 10px;
+      text-align: center;
+      line-height: 1.1;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    .scanner-text {
+      position: absolute;
+      bottom: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #39ff14;
+      font-family: 'Orbitron', monospace;
+      font-size: 16px;
+      text-align: center;
+      animation: scannerTextBlink 3s infinite;
+      text-shadow: 0 0 15px #39ff14, 0 0 30px rgba(57, 255, 20, 0.5);
+      white-space: nowrap;
+    }
+    @keyframes scannerTextBlink {
+      0%, 70% { opacity: 1; }
+      71%, 100% { opacity: 0.4; }
+    }
+
+    #logo-top, #admin-logo {
+      width: 140px !important;
+      height: 140px !important;
+      border-radius: 20px !important;
+      border: 4px solid #39ff14;
+      box-shadow: 0 0 40px rgba(57, 255, 20, 0.6);
+      background: rgba(0, 0, 0, 0.2);
+      padding: 4px !important;
+      transition: all 0.3s ease;
+      object-fit: contain !important;
+    }
+    #logo-top:hover, #admin-logo:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 60px rgba(57, 255, 20, 0.8);
+    }
+
+
+    body {
+      padding-bottom: 0 !important;
+    }
+
+    .index-main-content {
+      min-height: calc(100vh - 120px);
+      padding-bottom: 150px;
+    }
+
+    .investigator-button-section {
+      margin: 60px 0 80px 0;
+      position: relative;
+      z-index: 100;
+    }
+
+    @media (max-width: 768px) {
+      #investigation-scanner { width: 280px; height: 280px; }
+      .magnifying-glass { width: 50px; height: 50px; }
+      .glass-lens { width: 35px; height: 35px; }
+      .detective-badge { width: 70px; height: 70px; }
+      .scanner-text { font-size: 14px; }
+      #logo-top, #admin-logo { width: 120px !important; height: 120px !important; }
+      .index-main-content { padding-bottom: 180px; }
+      .investigator-button-section { margin: 40px 0 100px 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+
+  <div id="globe-container">
+    <div id="investigation-scanner">
+      <div class="radar-grid"></div>
+      <div class="radar-grid"></div>
+      <div class="radar-grid"></div>
+      <div class="radar-grid"></div>
+      <div class="crosshairs"></div>
+      <div class="radar-sweep"></div>
+      <div class="evidence-dot"></div>
+      <div class="evidence-dot"></div>
+      <div class="evidence-dot"></div>
+      <div class="evidence-dot"></div>
+      <div class="evidence-dot"></div>
+      <div class="detective-badge">
+        <div class="badge-text">SAFE<br>TRACER<br>by<br>NIDHIN R</div>
+      </div>
+      <div class="magnifying-glass">
+        <div class="glass-lens"></div>
+        <div class="glass-handle"></div>
+      </div>
+      <div class="scanner-text">🔍 AI INVESTIGATION SCANNER ACTIVE 🔍</div>
+    </div>
+  </div>
+
+  <div class="container text-center mt-4 index-main-content">
+    <div class="logo-container">
+      <img src="logo.png" alt="Safe Tracer Logo" id="logo-top">
+      <div class="ai-badge">by NIDHIN R</div>
+    </div>
+
+    <h1 class="main-title">SAFE TRACER by NIDHIN R</h1>
+    <p class="lead subtitle">
+      AI-Powered Crowdsourcing Platform for Online Child Sexual Exploitation and Abuse (OCSEA) Investigation<br>
+      <span class="kerala-police">Useful for Investigation agencies</span>
+    </p>
+
+    <div class="ai-status-bar mb-4">
+      <div class="ai-indicator" id="aiStatus">
+        <span class="ai-dot"></span>
+        <span id="aiStatusText">AI Systems: Initializing...</span>
+      </div>
+    </div>
+
+    <div id="clues-container" class="row justify-content-center my-5">
+      <div class="col-12">
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+          <p>Loading AI-processed investigation clues...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="investigator-button-section">
+      <button id="investigatorLoginBtn" class="btn btn-primary btn-lg login-btn">
+        🔐 Investigator Dashboard
+      </button>
+    </div>
+  </div>
+
+  <div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header">
+          <h5 class="modal-title" id="imageModalTitle">Case Evidence</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="modalImage" src="" alt="Case Evidence" style="max-width: 100%; max-height: 80vh;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <img src="logo.png" width="24" height="24" alt="logo" class="footer-logo">
+      <strong>Developed by NIDHIN R</strong> | AI-Powered Safe Tracer | r.nidhinofficial@gmail.com
+      <div class="ai-badge-small">Powered by Artificial Intelligence</div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
